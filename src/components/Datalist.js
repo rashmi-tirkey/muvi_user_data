@@ -1,6 +1,7 @@
 import React,{Component} from 'react'
 import {withRouter} from 'react-router-dom'
-
+import { connect } from "react-redux";
+import { editActive } from './../action/userAction';
 class Datalist extends Component {
     constructor(props){
         super(props);
@@ -8,10 +9,23 @@ class Datalist extends Component {
            pageIndex:5
         }
     }
+    componentDidMount(){
+        let data={
+            isEdit:false
+        }
+        this.props.editActive(data);
+    }
+    edituser=(data,i)=>{
+        data.index=i;
+        data.isEdit=true;
+        this.props.editActive(data);
+        this.props.history.push("/");
+    }
+    
     render(){
-        let data = JSON.parse(localStorage.getItem('Props'));
+        let data = this.props.userData;
         return(
-            <div className="main-wrapper">
+            <div className="main-wrapper" style={{paddingBottom:"20px"}}>
                 <div className="list-wrapper">
                 <h2>Userlist Page</h2>
                 <table class="table table-bordered">
@@ -31,7 +45,7 @@ class Datalist extends Component {
                            if(index<this.state.pageIndex) return (
                                 <tr>
                                     <td>{index}</td>
-                                    <td>{value.name}</td>
+                                    <td title="Edit" onClick={()=>this.edituser(value,index)} style={{color:"blue", cursor:"pointer"}}>{value.name} </td>
                                     <td>{value.country}</td>
                                     <td>{value.email}</td>
                                     <td>
@@ -51,5 +65,9 @@ class Datalist extends Component {
         )
     }
 }
-
-export default withRouter(Datalist);
+const mapStateToProps = state => {
+    return {
+        userData: state.userData
+    };
+};
+export default connect(mapStateToProps, {editActive})(withRouter(Datalist))
